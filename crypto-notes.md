@@ -32,4 +32,46 @@ when n = 1.2 x U^(1/2) ==> Pr[there exists two similar elements] >= 1/2
 
 # Stream ciphers
 
- 
+## Information theoretic security 
+
+A **cipher** is defined over a triple ( the key space, message space, cipher space) and does provide two functions E and D in such a way that D(k, E(k,m)) = m.
+
+E is sometimes randomised but D is always deterministic. 
+
+**The Vernam Cipher** is a cipher where the key is as long as the message where the cipher text is obtained by E(m,k)=(message XOR key) = cipher text and D(c,k) = c XOR k = message.
+
+Vernam is not useful in practise because if we have a secure channel to send the keys over, we could use that to send the message, so what’s the point of the cipher, right?
+
+A cipher (E,D) over (K, M, C) has **perfect secrecy** if for every m_0 and m_1 in M, length of m_0 is equal to the length of m_1 and for every c in C, Pr[E(k,m_0) = c] = Pr[E(k, m_1)=c].
+Perfect secrecy means that there are no cipher text only attack!
+
+If one cipher has perfect secrecy => |K| >= |M|, the key_length >= message_length.
+
+## Stream ciphers
+
+Idea: replace random key by pseudorandom key. 
+
+For the stream ciphers, we introduce a PRG: Pseudo-random generator.
+
+A **PRG** is a deterministic function G:{0,1}^s (seed space) -> {0,1}^n, n>>s.
+
+In stream ciphers, seed = key and define the following operations.
+E(k,m) := m XOR G(k)
+D(k,c) :=  c XOR G(k)
+
+## PRG
+A PRG must be unpredictable for a stream cipher to be secure. 
+
+We say G:K -> {0,1}^n is predictable if there exists an efficient algorithm A and there exists an i: 1<i<n-1 such as Pr[A(G(k))|i,…,i = G(k)|i+1] >= 1/2 + epsilon. (for some non-negligible epsilon).
+
+In short, a PRG is unpredictable: for all i, there is no efficient algorithm A, that can predict the i+1 bit following the prefix.
+
+NEVER USE Weak PRGs: Linear congruential generators (glibc random). 
+
+Negligible and non-negligible - In practise, epsilon is a scalar such as the event is not likely to happen. In theory, non-neg is defined as there exists d: epsilon(polynomial lambda) >= 1/(lambda^d) infinitely often. 
+
+TLDR’: The function is negligible if it’s less than all polynomial fractions. 
+
+## Attacks on OTP / stream ciphers
+
+The two time pad is insecure …
