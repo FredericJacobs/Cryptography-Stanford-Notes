@@ -74,4 +74,18 @@ TLDR’: The function is negligible if it’s less than all polynomial fractions
 
 ## Attacks on OTP / stream ciphers
 
-The two time pad is insecure …
+The two time pad is insecure. 
+
+Example: 
+c_1 = m_1  XOR PRG(k)
+c_2 = m_2 XOR PRG(k)
+
+If an attacker gets c_1 and c_2, he can perform c_1 XOR c_2 = m_1 XOR m_2
+
+The english language (and ASCII encoding) has enough redundancy to find m_1 and m_2. 
+
+Vulnerabilities found in Project Venona (1941-1946), MS-PPTP (Windows NT) and WEB where the same pad would be used every 16M frames. Even worse, most Wi-Fi cards do reset their IV back to zero on restart, causing the two time pad to appear way quicker because IC is concatenated with a long-term identity key.
+
+In disk encryption, issue of the one time pad is **malleability**. Because OTP *does not provide integrity-checking*, cipher text could be altered without the user knowing. If you know the difference between two strings, you can XOR that difference on the cipher text without knowing the key and it be changed in the cipher text without you having to know the key.
+
+ 
