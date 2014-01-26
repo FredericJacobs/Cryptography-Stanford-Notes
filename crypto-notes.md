@@ -155,4 +155,92 @@ We can adapt the definition of perfect secrecy from Shannon with the concept of 
 
 For every message m_0, m1 in M: E(k, m_0) is computationally indistinguishable from E(k, m_1). 
 
-A cipher is **semantically secure** if for all efficient adversary A, Adv[A, cipher] is negligible.   
+A cipher is **semantically secure** if for all efficient adversary A, Adv[A, cipher] is negligible. 
+
+# Block Ciphers
+
+A block cipher maps n bits of inputs to n bits of output. 
+Examples : 
+- 3DES: n=64bits, k=168 bits
+- AES: n=128bits, k = 128,192,256 bits
+
+Block ciphers are typically built by iteration with a round function. It takes as input the  round key and the message. 
+
+Block ciphers are considerably slower than stream ciphers. (+/- 6x slower if you compare Salsa to AES)
+
+## Pseudo Random Function (PRF)
+
+A PRF is defined over (K, X, Y) with F: K x X -> Y such  that there exists an efficient algorithm to evaluate F(k,x). 
+
+Note: A PRF doesn’t need to be revertible. 
+
+## Pseudo Random Permutation (PRP)
+
+A PRP (block cipher) is defined over (K,X) with E: K x X -> X such that:
+- Exists efficient and deterministic algorithm to evaluate E(k,x)
+- The function E(k, ・) is one-to-one.
+- Exists an efficient inversion algorithm D(k,y)
+
+Examples:
+- 3DES: K x X -> X where X = {0,1}^64 , K = {0,1}^168
+- AES: K x X -> X where K = X = {0,1}^128
+
+Any block cipher or PRP is also a PRF : A PRP is a PRF where X = Y and is efficiently invertible.
+
+### Secure PRF
+
+Let F: K x X -> Y be a PRF
+- Funs[X,Y]: the set of all functions from X to Y
+- S_{F} = { F(k,・) s.t. k ∈ K} ⊆ Funs[X,Y]
+
+Intuition: A PRF is secure if a random function in Fun[X,Y] is indistinguishable from a random function in S_F.
+
+### PRF gives us a PRG
+
+Let F: K x {0,1}^n -> {0,1}^n be a secure PRF. Then the following G: K -> {0,1}^{nt} is a secure PRG: G(k) = F(k,0) || F(k,1) || … || F(k,t)
+Key property: parallelizable
+Security from PRF property: F(k,・) indistinguishable from a random function f(・)
+
+## DES (Data Encryption Standard)
+
+Early 1970: Horst Feistel designs Lucifer at IBM. key-len = 128 bits, block-len = 128 bits.
+1973: NBS (old name of NIST) asks for block cipher proposals. IBM submits variant of Lucifer. 
+1976: NBS adopts DES as a federal standard. key-len = 56 bits. block-len = 64 bits.
+Note: This is yet another example where standard bureaus do weaken cryptography. 
+1997: DES broken by exhaustive search
+2000: NIST adopts Rijndael as AES (Advanced Encryption Standard) to replace DES.
+
+Widely deployed in banking (ACH) and commerce.
+
+### Feistel Network
+Given functions f_1, …, f_d: {0,1}^n -> {0,1}^n 
+Goal: build invertible function F:{0,1}^{2n} -> {0,1}^{2n}
+A Feistel Network mapping a 2n bit input to 2n bit output:
+Encryption
+L_i = R_{i-1}
+R_i =  L_i XOR f_i (R_{i-1})
+Decryption
+L_i = f_{i+1} (L_{i+1}) XOR R_{i+1}
+R_i = L_{i+1}
+
+![Construct Inverse](http://cl.ly/TZkE/Screen%20Shot%202014-01-26%20at%2013.42.32.png)
+
+Feistal networks are a general method for building invertible functions (block ciphers) from arbitrary functions. And it’s used in many block ciphers but not AES. 
+
+The Luby-Rackoff Theorem proves that if I take a secure PRF and let it go through 3 rounds of a Feistal network, the result is a secure PRP. Formally
+f: K x {0,1}^n -> {0,1}^n a secure PRF => 3-round Feistel F: K^3 x {0,1}^{2n} -> {0,1}^{2n} is a secure PRP. 
+
+### DES is a 16 round Feistel network
+f_1, … , f_1: {0,1}^32 -> {0,1}^32, f_i (x) = F{k_i, x} where k_i is a round key from the key expansion. For decryption, the algorithm is the same but you use the round keys in reverse-order. 
+F(k_i, x) is taking a 32-bit value x and a 48-bit round key k_i.
+
+![F function](http://cl.ly/TYeV/Screen%20Shot%202014-01-26%20at%2014.03.08.png)
+
+### S-boxes
+
+S-boxes are just lookup tables. If S-Boxes were linear (if the S-boxes could be written as a Matrix vector product), the entire cipher would be linear and quickly broken. If S-Boxes would be random, it would result in an insecure block cipher (key recovery after 2^24 outputs). 
+
+So what are the creators of DES advising to make S boxes lookup tables? 
+- No output bit should be close to a linear function of the input bits
+- S-boxes are 4 to 1 maps.
+- …
