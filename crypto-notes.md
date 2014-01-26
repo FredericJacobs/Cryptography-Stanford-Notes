@@ -244,3 +244,43 @@ So what are the creators of DES advising to make S boxes lookup tables?
 - No output bit should be close to a linear function of the input bits
 - S-boxes are 4 to 1 maps.
 - …
+
+### Exhaustive search on DES
+
+Goal: given a few input/output pairs (m_i, c_i = E(k, m_i)), find key k. 
+
+Lemma: Suppose DES is an **ideal cipher** (2^56 random invertible functions). Then for all m,c there is at most one key k such that c = DES(k,m).
+
+With two input-output pairs, the probability that the key is unique is very close to one for both DES and AES. Hence, two input/output pairs are enough for exhaustive key search. 
+
+RSA issued a challenge to break DES exhaustively:
+- 1997: Internet Distributed Search = 3 months
+- 1998: EFF machine (deep crack) = 3 days
+- 1999: combined search = 22 hours
+- 2006: COPACOBANA (FPGA) = 7 Days (cheap!)
+
+**DES is broken**
+
+How do we make DES more expensive to do exhaustive search? More rounds!
+
+#### Method 1: Triple DES. 
+
+Triple DES is also 3x slower for encryption :( 
+
+The key-size of 3DES is 3*56 bits = 168 bits but does not provide 168 bits security only 118 bits. -> Meet in the middle attack
+
+For 2DES: exhaustive search is formulated as finding (k_1,k_2) such that E(k_1, E(k_2, M)) = C. A meet-in-the-middle attack is E(k_2, m) = D(k_1,c)
+
+Step 1: Build table of pairs (k0…kN ; E(k0, M)…E(KN, M)
+Step 2: For all k ∈ {0,1}^56: test if D(k,C) is in 2nd column. 
+Step 3: If found, then E(k^i, M) = D(k,c) => (k^i, k) = (k_2, k1) 
+
+Running time = Time = 2* 2^56  * log 2^56 < 2^63 << 2^112 
+
+Same attack on 3DES: Time = 2^(118), space = 2^56
+
+#### Method 2: DESX
+
+E: K x {0,1}^n —> {0,1}^n a block cipher. EX((k,1,k2,k3), m) = k_1 XOR E(k_2, m XOR k_3)
+key-length = 184 bits. Attack known in 2^120.
+
