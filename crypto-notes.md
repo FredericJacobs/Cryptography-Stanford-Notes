@@ -372,3 +372,12 @@ Related key attack on AES-256: If related keys => 2^99 security! *Importance to 
 
 ## Building block ciphers from PRG
 
+Can we build a PRF from a PRG? 
+
+Let’s start with a PRG G such that G:K -> K^2 be a secure PRG. 
+
+Define 1-bit PRF F:Kx{0,1} -> K as F(k, x in {0,1}) = G(k)[x]
+
+If G is a secure PRG, then F is a secure PRF on {0,1}^n => Not used in expanded mode due to performance reasons. 
+
+Thanks to the Luby-Rackoff theorem, we know that we can thus make a secure PRP with a 3-round Feistal network.
