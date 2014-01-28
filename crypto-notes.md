@@ -284,3 +284,91 @@ Same attack on 3DES: Time = 2^(118), space = 2^56
 E: K x {0,1}^n —> {0,1}^n a block cipher. EX((k,1,k2,k3), m) = k_1 XOR E(k_2, m XOR k_3)
 key-length = 184 bits. Attack known in 2^120.
 
+## Implementation attacks on block ciphers
+
+### Side channel attacks
+
+Measuring noise, time, power consumption for encryption and decryption.
+
+### Fault attacks
+
+Computing errors in the last round expose the secret key k. 
+
+### Conclusion on implementation attacks
+
+Don’t even implement these primitives yourself!
+
+## Attacks on block ciphers
+
+### Linear and differential attacks (Linear cryptanalysis)
+
+Given many inp/out pairs, can recover key in less than exhaustive search (2^56 for DES)
+
+Pr[m[i_1] XOR … XOR m[i_r] XOR c[j_j] XOR … XOR c[j_v] = k[l_1] XOR … XOR k[l_u] ] = 1/2 + epsilon
+
+For DES, epsilon = 1/(2^(21)) because the fifth S-Box is too close to a linear function. 
+
+How can we attack it to find key bits? 
+
+Given 1/epsilon^2 random (m, c=DES(k, m) ) pairs then 
+k[l_1, … , l_u] = MAJ [ m[i_1 , … , i_r] XOR c[j_j, …,j_v] ] with probability 97.7%. 
+
+For DES, with 2^42 inp/out pairs, you can find k[l_i, …, l_u] in time 2^42. Roughly speaking: you can find 14 = 2 +12(from the 5th S-box) key bits this way in time 2^42.
+
+There are 42 remaining bits in the key. Overall, the total attack time = 2^43 way better than 2^56! Better than exhaustive search.
+
+Lesson: A tiny bit of linearity in S_5 lead to a 2^42 time attack! NEVER DESIGN YOUR OWN BLOCK CIPHER. 
+
+### Quantum attacks
+
+If you could build a quantum computer, a generic search problem that would be solved in O( |X| ), can be solved in O( |X|^(1/2) ) whatever the function is. 
+
+Examples:
+- DES = 2^28
+- AES-128 = 2^64
+- AES-256 = 2^128 
+
+## AES
+
+### History 
+
+- 1997: NIST publishes request for proposal 
+- 1998: 15 submissions (5 claimed attacks)
+- 1999: NIST chooses 5 finalists
+- 2000: NIST chooses Rijndael as AES (designed in Belgium)
+
+Key sizes = 128, 192, 256 bits. Larger keys: slower but thought to be more secure.
+
+Block size = 128 bits
+
+### Design
+
+AES is a substitution-permutation network. In a Feistal network, half of the bits are not changed in every round. In a subs-perm network, all bits are changed on every round. 
+
+AES-128 schematic 
+
+![AES-128](http://cl.ly/Tc1N/Screen%20Shot%202014-01-28%20at%2014.36.28.png)
+
+AES operates on 128 bits, a 4x4 matrix, each cell containing a byte. Then we XOR with the first round key, apply the round function, x10 and then we get the output. The keys are coming from the 16 bytes AES key using key expansion.
+ 
+![AES-128-RoundFunctions](http://cl.ly/TbLk/Screen%20Shot%202014-01-28%20at%2014.36.35.png)
+
+Overview of the round function: 
+- Byte substitution: one byte S-Box (256 byte table). We take the current cell as an index into the lookup table, and the value is the output.
+- Shift row step: We shift the second row from 1 position, third row by 2 positions and last row by 3 positions.
+- Mix column: We apply a linear transformation to each of the communes independently. 
+
+### How to use AES
+
+If you want to send an implementation over a network. Don’t send precomputed table but algorithm to compute it. And then compute them upon receival. 
+
+AES is implemented in hardware. aesenc, aesenclast: one round of aes. aeskeygenassist, perform key expansion. 14 times faster than software. 
+
+### Attacks on AES
+
+Best key recovery attack: four times better than exhaustive search. 128key => 126 key.
+
+Related key attack on AES-256: If related keys => 2^99 security! *Importance to choose keys at random*.
+
+## Building block ciphers from PRG
+
