@@ -381,3 +381,55 @@ Define 1-bit PRF F:Kx{0,1} -> K as F(k, x in {0,1}) = G(k)[x]
 If G is a secure PRG, then F is a secure PRF on {0,1}^n => Not used in expanded mode due to performance reasons. 
 
 Thanks to the Luby-Rackoff theorem, we know that we can thus make a secure PRP with a 3-round Feistal network.
+
+## Notes and review
+
+A block cipher maps n bits of input to n bits of output. 
+
+PRF -> function, X -> Y, doesn’t have to be the same. 
+PRP -> One to one revertible function. Domain X=Y. Key concept to build a block cipher.
+
+Any secure PRP is also a secure PRF if |X| is sufficiently large.
+
+Lemma: Let E be a PRP over (K,X) then for any q-query adversary A: |Adv_{PRF} [A,E] - Adv_{PRF} [A,E] | < q^2 / 2|X|
+When X is large, the ratio will be negligible.
+
+From now on, we consider AES or 3DES as secure PRPs.
+
+## Security for one-time key
+
+Let’s start with a threat model (one-time keys) defined as follows:
+- Adversary’s power: Adv sees only one cipher text
+- Adversary’s goal: Learn info about PT from CT (semantic security)
+
+Reminder: semantic security for a one-time key. The attacker, if given c_0 and c_1 and m_0 and m_1 can’t know which one is the result of what message. 
+Adv_{SS} [A, OTP] = | Pr[ EXP(0)=1 ] - Pr[ EXP(1) = 1 ] |
+
+## Security for many-time key
+
+Why? Many applications: Filesystems or IPSec, encrypts a lot of traffic with the same key. 
+
+When we use a key more than once, the adversary sees many cipher texts with the same key. 
+
+Adversary power: chosen-plaintext attack, the attacker can obtain the encryption of arbitrary messages of his choice (How does it work IRL? You can email someone, email will be stored encrypted on disk and boom you have m and c).
+
+Adversary goal: Break semantic security
+
+Semantic-security for many-time key: 
+
+## Modes of operation
+
+Goal: Build a secure encryption from a secure PRP
+
+### ECB (Electronic Code Book) - One time key
+
+ECB is badly broken. It works by breaking down the message into n blocks of size of the block cipher and then encrypt each of the parts individually. Issue, the attacker learns when a two segments have the same value. (if m_1 = m_2 -> c_1 = c_2)
+
+ECB is not semantically secure.
+![ECB’s advantage is 1!](http://cl.ly/Tdm9/Screen%20Shot%202014-01-30%20at%2011.28.png)
+
+### Deterministic counter mode from a PRF F (eg. AES) - One time key
+
+E_{DETCTR} (k,m) = We build a stream cipher from a PRF.
+
+![Deterministic Counter Mode](http://cl.ly/Te5t/Screen%20Shot%202014-01-30%20at%2011.37.39.png)
