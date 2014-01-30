@@ -415,7 +415,15 @@ Adversary power: chosen-plaintext attack, the attacker can obtain the encryption
 
 Adversary goal: Break semantic security
 
-Semantic-security for many-time key: 
+Semantic-security for many-time key is defined exactly as semantic security for a one-time key but he can repeat any of the messages in the challenge that the attacker can choose. ==> Chosen Plaintext attack.
+
+All the deterministic encryption schemes we’ve seen before are broken under CPA. 
+
+So how do we fix this?
+
+1) Randomized encryption: encrypting same message twice gives different cipher text. Ciphertext must be longer than plaintext. size(CT) = size (PT) + “#random bits”
+
+2) Nonce-based encryption. We define a **nonce** as a value that changes from message to message. The pair (k, n) should NEVER be used more than once. The nonce can conveniently be a counter (if in-order and reliable transmission channel, no need to transmit nonce). If same key used by multiple machines, the nonce space needs to be very big and picked at random (easier to implement a “stateless” protocol)
 
 ## Modes of operation
 
@@ -433,3 +441,5 @@ ECB is not semantically secure.
 E_{DETCTR} (k,m) = We build a stream cipher from a PRF.
 
 ![Deterministic Counter Mode](http://cl.ly/Te5t/Screen%20Shot%202014-01-30%20at%2011.37.39.png)
+
+### CBC (Cipher Block Chaining with a random IV) - Many time key
