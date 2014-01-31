@@ -442,4 +442,29 @@ E_{DETCTR} (k,m) = We build a stream cipher from a PRF.
 
 ![Deterministic Counter Mode](http://cl.ly/Te5t/Screen%20Shot%202014-01-30%20at%2011.37.39.png)
 
-### CBC (Cipher Block Chaining with a random IV) - Many time key
+### CBC (Cipher Block Chaining with a random IV) - Many time key (CPA security)
+
+#### IV-based encryption
+
+When we start encrypting the first block, we pick a random IV (initialization vector of length one bloc).  We XOR the first message with it before encrypting. 
+IV is publicly known and prepended to the cipher text. 
+Chaining is done by for the next block XORing the cipher text of the first block with the new message and then encrypting. 
+
+What security does it provide? 
+
+It does provide semantic security:
+
+Adv_CPA [A , E_{CBC} ] =< 2 * Adv_PRP [B, E] + (2 q^2 L^2 / |X| = error term, needs to be negligible) 
+
+**CBC is secure as long as q^2L^2 << |X| where L is the length of the messages and q is the number of times we used q to encrypt messages.**
+
+Applied to AES, this means that after 2^48 blocks, we need to replace the key. 
+
+Cipher is not CPA secure if the IV is predictable. 
+
+#### Nonce-based encryption
+
+Cipher-block chaining with unique nonce. (no need to include in first cipher text)
+
+If nonce is not random, it needs to be xored with first block.
+ 
