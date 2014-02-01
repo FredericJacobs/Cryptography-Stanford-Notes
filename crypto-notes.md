@@ -462,9 +462,36 @@ Applied to AES, this means that after 2^48 blocks, we need to replace the key.
 
 Cipher is not CPA secure if the IV is predictable. 
 
+![IV-based encryption](http://cl.ly/ThMj/Screen%20Shot%202014-02-01%20at%2021.47.48.png)
+
 #### Nonce-based encryption
 
 Cipher-block chaining with unique nonce. (no need to include in first cipher text)
 
 If nonce is not random, it needs to be xored with first block.
+
+![Nonce-based CBC](http://cl.ly/Tgje/Screen%20Shot%202014-02-01%20at%2021.47.34.png)
+
+#### Padding 
+
+In TLS, you pad the n remaining bytes with the number n. If no pad is needed, add a dummy block. 
  
+### Randomised Counter-mode (superior to CBC) 
+
+Unlike CBC, randomised counter-mode doesn’t need a secure block cipher (PRP) but works with a secure PRF because we’re never going to invert the function F. 
+
+How does it work?
+
+We pick a random IV, then we XOR the messages blocks with F(k,IV + message block number)
+
+Nonce based counter mode: IV = [ 64-bit nonce | 64-bit counter (starts at 0 for every message)]
+
+Note that we can encrypt a maximum of 2^64 blocks per nonce because otherwise the counter overflows and the pad would be used a second time.
+
+We can use counter-mode for more blocks than CBC because  the adversary’s advantage is 2q^2L / |X| < CBC’s advantage. 
+
+For AES, we can encrypt 2^64 AES blocks  with the same key with semantic secrecy. 
+ 
+Advantage: It’s parallelizable! Fast encryption! And is so much better than CBC.
+
+![CBC vs Counter](http://cl.ly/TgXt/Screen%20Shot%202014-02-01%20at%2022.38.13.png)
