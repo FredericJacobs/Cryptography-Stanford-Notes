@@ -495,3 +495,47 @@ For AES, we can encrypt 2^64 AES blocks  with the same key with semantic secrecy
 Advantage: It’s parallelizable! Fast encryption! And is so much better than CBC.
 
 ![CBC vs Counter](http://cl.ly/TgXt/Screen%20Shot%202014-02-01%20at%2022.38.13.png)
+
+# Message Integrity 
+
+## Message Authentication Codes (MAC)
+
+A MAC is defined as (S,V) and defined over (K, M, T) is a pair of algorithms:
+- S(k,m), the signing algorithm, outputs t (tag) in T 
+- V(k,m,t), the verification algorithm, outputs yes or no
+
+— 
+
+Consistency requirement: for every message and for every key: V(k, m, S(k,m)) = yes
+
+—
+
+Integrity requires a shared key between Alice and Bob. Algorithms like CRC do detect random errors but not malicious errors! 
+
+### Secure MACs 
+
+The attacker’s power : chose message attack:
+- for m_1 … m_q attacker is given t_i <- S(k,m_i)
+
+The attacker’s goal: Existential forgery
+- produce some new valid message/tag pair (m,t): (m,t) different than any pair that is given to him.
+
+What does this mean?
+- The attacker cannot produce a valid tag for a new message.
+- Given (m,t) attacker cannot even produce (m,t’) for t != t’
+
+—
+
+Definition: I=(S,V) is a secure MAC if for all “efficient” A: Adv_{MAC} [A, I] = Pr[Chal. outputs 1] is negligible.
+
+—
+
+A secure PRF => Secure MAC if the output space of the PRF is big enough. In practice, 80-bits is good security for a PRF. 
+
+We can use AES for 16-byte messages but how can we convert a MAC for small inputs and scale them for bigger inputs. The output of a n bit PRF can be truncated. 
+
+### (encrypted) CBC-MAC
+
+ 
+
+### HMAC
