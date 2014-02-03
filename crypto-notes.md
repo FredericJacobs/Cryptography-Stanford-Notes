@@ -536,6 +536,40 @@ We can use AES for 16-byte messages but how can we convert a MAC for small input
 
 ### (encrypted) CBC-MAC
 
- 
+Let F:K x X -> X be a PRP, define a new PRF F_ECBC:K^2 x X^{=< L} -> X
 
-### HMAC
+![CBC-MAC construction](http://cl.ly/The8/Screen%20Shot%202014-02-03%20at%2015.36.37.png)
+
+### NMAC
+
+Let F:K x X -> K be a PRF, define a new PRF F_NMAC : K^2 x X^{=<L} -> K.
+
+![NMAC Construction](http://cl.ly/TiX2/Screen%20Shot%202014-02-03%20at%2015.44.55.png) 
+
+![CBC-MAC vs NMAC](http://cl.ly/Tiod/Screen%20Shot%202014-02-03%20at%2015.36.37.png)
+
+### MAC padding
+
+Errors in padding can have disastrous consequences, just imagine if someone can forge a banking transaction with an additional 0! 
+
+So, how do we pad?  Padding must be reversible (1 to 1) to make sure it’s unique. We pad with “100…0”. Add a new dummy block if the message size is already a multiple of the block size.
+
+### CMAC
+
+Variant of CBC-MAC where no additional encryption step is necessary and no need to add a dummy block. CMAC uses key = (k, k_1, k_2) where k_1 and k_2 are derived from K. 
+
+![CMAC construction](http://cl.ly/TiW6/Screen%20Shot%202014-02-03%20at%2017.07.21.png)
+
+### PMAC - Parallel MAC
+
+All the PRFs seen so far for MACs are sequential. PMAC is parallel and incremental (if one block changes, no need to recompute everything). 
+
+![PMAC Construction](http://cl.ly/Thwf/Screen%20Shot%202014-02-03%20at%2017.23.06.png)
+
+### One-time MAC
+
+![One Time MAC example](http://cl.ly/Til8/Screen%20Shot%202014-02-03%20at%2017.51.37.png)
+
+### Many-time MAC
+
+![Many Time MAC](http://cl.ly/TiMx/Screen%20Shot%202014-02-03%20at%2017.53.44.png)
