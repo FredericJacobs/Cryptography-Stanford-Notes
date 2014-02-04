@@ -573,3 +573,62 @@ All the PRFs seen so far for MACs are sequential. PMAC is parallel and increment
 ### Many-time MAC
 
 ![Many Time MAC](http://cl.ly/TiMx/Screen%20Shot%202014-02-03%20at%2017.53.44.png)
+
+## Collision Resistance
+
+Let H:M -> T be a hash function (|M| >> |T|)
+
+A **collision** for H is a pair m_0, m_1 in M such that: H(m_0) = H(m_1) and m0 != m1
+
+A function H is **collision resistant** if for all efficient algorithms A: Adv_CR [A,H] = PR[A outputs collision for H] is negligible. 
+
+If we have a collision-resistant function, we can build MACs for bigger messages from secure MACs that work on smaller messages.
+
+### Protecting file integrity
+
+If we have a public read-only space and no key, we can use a collision resistant hash function to verify integrity of a package.
+
+### Birthday attack
+
+Using the birthday paradox, we can predict collisions with probability: when n = 1.2 * B^{1/2} then Pr[collision] => 1/2
+with n, number of items in attack set and B, number of items in universe.
+
+### Using Hash-functions
+
+Use SHA-512 is recommended. 
+
+### The Merkle-Damgard Paradigm
+
+![Merkle Damgard](http://cl.ly/Tiap/Screen%20Shot%202014-02-04%20at%2001.27.14.png)
+
+Security guaranteed by theorem that claims that if h is collision resistant then so is H
+
+### Compression functions
+
+#### Davies-Meyer compression function based on block ciphers
+
+The Davies-Meyer compression function: h(H,m) = E(m, H) XOR H
+
+Theorem: Suppose E is an ideal block cipher. Finding collisions h(H,m)=h(H’,m’) takes O(2^(n/2)) - same as birthday attack, best possible, evaluations of (E,D).
+
+### SHA-256
+
+SHA-256 is a Merkle-Damgard function that uses the Davies-Meyer compression function and where the block cipher used is SHACAL-2 (512-bit keys) and block size of 256 bits. 
+
+### HMAC - MAC from SHA256
+
+HMAC: S(k,m) = H( k XOR opad, H( k XOR ipad || m))
+
+![HMAC In Pictures](http://cl.ly/Ti2P/Screen%20Shot%202014-02-04%20at%2001.47.50.png)
+
+ipad and opad are 512 bits constants. 
+
+### Verification timing attacks
+
+Make sure that verification is constant time.
+
+1) Iterate through every set of bytes. Be careful of compiler optimisations!
+2) Compute correct MAC, we hash the correctly computed MAC again and then compare byte by byte. This way the attacker doesn’t know what is being compared!
+
+Lesson: Don’t implement your own crypto!
+
