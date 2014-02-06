@@ -632,3 +632,32 @@ Make sure that verification is constant time.
 
 Lesson: Don’t implement your own crypto!
 
+## Authenticated Encryption
+
+**Confidentiality (CPA secure ciphers) without integrity cannot guarantee secrecy under active attacks.**
+
+If message needs integrity but no confidentiality -> MAC. If message needs both integrity and confidentiality, use authenticated encryption modes.
+
+Example of attack: Altering destination port of IP packet even if CPA secure cipher is possible by changing IV (if in CBC mode for instance).
+
+### Definition
+
+An authenticated encryption system (E,D) is a cipher where E:K x M x N -> C and D: K x C x N -> M ∪ {ciphertext is rejected}. 
+
+The system must provide both semantic security under a CPA attack and cipher text integrity (attacker cannot create new cipher texts that decrypt properly).
+
+### Implications
+
+Authenticated ciphers do provide:
+- Authenticity: Attacker cannot fool Bob into thinking a message was sent from Alice. (doesn’t protect against replay/side channels attacks though)
+- Security against chosen cipher text attack
+
+### Chosen cipher text security
+
+Adversary’s power : both CPA and CCA
+- Can obtain the encryption of arbitrary messages of his choice
+- Can decrypt any cipher text of his choice other than the challenge
+Adversary goal : break semantic security.
+
+Let (E,D) be a cipher that provides authenticated encryption, then (E,D) is CCA secure. 
+
