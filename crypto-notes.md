@@ -693,3 +693,8 @@ See course & slides
 
 Encrypt-then-MAC would completely avoid issues of MAC verifications in TLS because the MAC is checked first and ciphertext discarded if invalid. MAC-then CBC provides AE but padding oracle destroys it. 
 
+### Attacking non-atomic decryption
+
+The attacker can “stream” the bits of the ciphertext and then see when the MAC is verified because it’s probably going to be false and hence learn the first LSB of a message.
+
+Lesson: Never partially decrypt ciphertext, always take blocks.
