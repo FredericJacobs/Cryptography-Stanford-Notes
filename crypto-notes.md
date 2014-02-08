@@ -684,4 +684,12 @@ All these modes are AEAD (auth enc. with associated data, partial encryption but
 After authenticated encryption got formalised. People started thinking about newer constructions that would provide AE without combining an encryption mode and a MAC algorithm. 
 
 OCB is an example of that. OCB is parallelizable. Sadly, OCB is not used because of patents :(
-  
+ 
+### TLS & WEP
+
+See course & slides
+
+### Avoiding implementation mistakes
+
+Encrypt-then-MAC would completely avoid issues of MAC verifications in TLS because the MAC is checked first and ciphertext discarded if invalid. MAC-then CBC provides AE but padding oracle destroys it. 
+
