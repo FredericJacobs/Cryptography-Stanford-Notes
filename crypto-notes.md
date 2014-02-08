@@ -640,6 +640,10 @@ If message needs integrity but no confidentiality -> MAC. If message needs both 
 
 Example of attack: Altering destination port of IP packet even if CPA secure cipher is possible by changing IV (if in CBC mode for instance).
 
+—
+
+Authenticated encryption  was introduced in 2000 but before then, many crypto libraries supported CPA-secure encryption and MAC. Every developer had to find his own 	way of combining both to provide AE.
+
 ### Definition
 
 An authenticated encryption system (E,D) is a cipher where E:K x M x N -> C and D: K x C x N -> M ∪ {ciphertext is rejected}. 
@@ -661,3 +665,23 @@ Adversary goal : break semantic security.
 
 Let (E,D) be a cipher that provides authenticated encryption, then (E,D) is CCA secure. 
 
+### Encrypt-then-Mac vs MAC-then-Encrypt
+
+Three approaches:
+- MAC-then-Encypt (SSL): May be insecure against CCA attacks. If you’re using rand-CTR mode or rand-CBC, you have authenticated encryption. And for rand-ctr mode, one time MAC is sufficient.
+- **Encrypt-then-Mac** (IPSec): This is the favorite method. Because encryption provides confidentiality on the message and then the MAC algorithm provides the signing. Always correct. 
+- Encrypt and MAC (SSH) : This means that MACs (of the message) are concatenated with the cipher text. This is an issue if the MACing algorithm reveals information about the plaintext. (MAC algorithms are not designed for confidentiality, only integrity). No issues with the specifics of SSL though but should really not be used.
+
+### Standards
+
+All these modes are AEAD (auth enc. with associated data, partial encryption but fully authenticated) and nonce-based.
+- GCM (Galois counter mode - NIST): CTR mode encryption then CW-MAC. Recommended way to provide authenticated encryption if code size is not an issue (non-embedded systems).
+- CCM (CBC counter mode - NIST): CBC-MAC then CTR mode encryption (used for 802.11)
+- EAX : CTR mode encryption then CMAC.
+
+### New constructions
+
+After authenticated encryption got formalised. People started thinking about newer constructions that would provide AE without combining an encryption mode and a MAC algorithm. 
+
+OCB is an example of that. OCB is parallelizable. Sadly, OCB is not used because of patents :(
+  
